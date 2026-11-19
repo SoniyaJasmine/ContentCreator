@@ -1,0 +1,111 @@
+
+{% extends 'generator/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="custom-card">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="section-title">My Course Topics</h2>
+            <p class="text-muted">
+                Generate educational notes using Gemini AI.
+            </p>
+        </div>
+
+        <a href="{% url 'generate_content' %}"
+           class="btn btn-primary">
+            + Generate Content
+        </a>
+
+    </div>
+
+    {% if topics %}
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+                    <tr>
+                        <th>Topic</th>
+                        <th>Created Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for topic in topics %}
+
+                    <tr>
+
+                        <td>{{ topic.title }}</td>
+
+                        <td>
+                            {{ topic.created_at|date:"d M Y" }}
+                        </td>
+
+                        <td>
+
+                            {% with content=topic.generated_contents.first %}
+
+                                {% if content %}
+                                    <a href="{% url 'content_detail' content.pk %}"
+                                       class="btn btn-sm btn-primary">
+                                        View Content
+                                    </a>
+                                {% endif %}
+
+                            {% endwith %}
+
+                            <form method="POST"
+                                  action="{% url 'delete_topic' topic.pk %}"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Delete this topic?')">
+
+                                {% csrf_token %}
+
+                                <button class="btn btn-sm btn-danger">
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="text-center py-5">
+
+            <h5>No course topics available.</h5>
+
+            <p class="text-muted">
+                Start by generating your first course topic.
+            </p>
+
+            <a href="{% url 'generate_content' %}"
+               class="btn btn-primary">
+                Generate Your First Content
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
